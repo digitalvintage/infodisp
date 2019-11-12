@@ -1,0 +1,7 @@
+---
+# handlers file for infodisp.role
+
+- name: infodispd_restart
+  service:
+    name: infodispd
+    state: restarted

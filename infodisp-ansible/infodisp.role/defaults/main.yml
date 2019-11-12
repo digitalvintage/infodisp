@@ -1,0 +1,13 @@
+---
+# defaults file for infodisp.role
+
+# infodisp.conf settings
+infodisp_conf:
+  device: "/dev/ttyS0"
+  ########  """12345678901234567890""" - max 20 chars
+  greeting: "\"IBM System x3620 M3\""
+  sleep: "sleep"
+  interfaces: "eno1"
+  modules: "all"
+  showtime: "7"
+  accuracy: "2"

@@ -1,0 +1,25 @@
+---
+# tasks file for infodisp.role
+
+- name: Disable APC UPS module
+  file:
+    path: /etc/infodisp/modules-enabled/apcupsd.module
+    state: absent
+
+- name: Reconfigure settings
+  ini_file:
+    path: /etc/infodisp/infodisp.conf
+    section: Default
+    option: "{{ var_item.key }}" 
+    value: "{{ var_item.value }}"
+    backup: no
+    no_extra_spaces: yes
+  with_dict: "{{ infodisp_conf }}"
+  loop_control:
+    loop_var: var_item
+  notify: infodispd_restart
+
+- name: Insure infodispd is started
+  service:
+    name: infodispd
+    state: started

@@ -1,0 +1,60 @@
+---
+# tasks file for infodisp.role
+- name: Install dependencies
+  yum:
+    name: 
+      - coreutils
+      - bc
+      - net-tools
+    state: present
+
+- name: Create infodisp directory
+  file:
+    path: ~/infodisp
+    state: directory
+
+- name: Unpack Infodisp distribution to remote server
+  unarchive:
+    src: ../files/infodisp-1.1-noarch.tar.gz
+    dest: ~/infodisp
+
+- name: Check permissions for infodisp installer
+  file: 
+    path: ~/infodisp/infodisp/install.sh
+    recurse: no
+    state: file
+    owner: root
+    group: root
+    mode: +x
+
+- name: Run infodisp installer
+  shell: ~/infodisp/infodisp/install.sh
+  args:
+    executable: /bin/bash
+
+- name: Disable APC UPS module
+  file:
+    path: /etc/infodisp/modules-enabled/apcupsd.module
+    state: absent
+
+- name: Configure settings
+  ini_file:
+    path: /etc/infodisp/infodisp.conf
+    section: Default
+    option: "{{ var_item.key }}" 
+    value: "{{ var_item.value }}"
+    backup: no
+    no_extra_spaces: yes
+  with_dict: "{{ infodisp_conf }}"
+  loop_control:
+    loop_var: var_item
+
+- name: (Re)Start infodisp daemon
+  service:
+    name: infodispd
+    state: restarted
+
+- name: Remove infodisp distribution
+  file:
+    path: ~/infodisp
+    state: absent

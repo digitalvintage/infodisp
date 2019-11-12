@@ -1,0 +1,14 @@
+---
+# tasks file for infodisp.role
+
+- name: Get infodisp service state
+  command: systemctl is-active infodispd
+  register: infodispd_state
+
+- name: (Re)Install Infodisp
+  include: install.yml
+  when: infodispd_state.stdout != "active"
+
+- name: Configure Infodisp
+  include: configure.yml
+  when: infodispd_state.stdout == "active"

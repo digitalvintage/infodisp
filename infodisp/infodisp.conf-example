@@ -1,0 +1,44 @@
+##############################################################################
+##### infodisp.conf               ############################################
+##############################################################################
+##### Config for infodisp         ############################################
+##### version 1.1 2018/07/05      ############################################
+##### System Status Daemon        ############################################
+##### for Epson Mode Compatible   ############################################
+##### Character Displays          ############################################
+##############################################################################
+##### (С) Vitaly Prokofiev, 2018  ############################################
+##### infodisp.digitalvintage.ru  ############################################
+##### Licensed under GNU GPL v3   ############################################
+##############################################################################
+[Default]
+
+# Set the device (usually ttyS0 for RS-232 displays)
+device=/dev/ttyS0
+
+# Set program using for sleep function: sleep or usleep
+sleep=sleep
+
+# Select network interfaces to monitor throughput 
+# "all" - will enable monitoring on all physical ethernet interfaces - which name starts with "e"
+# "running" - will monitor all running interfaces, but will not inform about link down
+interfaces=running
+
+# Select internal modules you want to show. Possible values:
+# clock, uptime, memcpu, netspeed - to control internal modules.
+# "all" - enables all available modules.
+# "external" - will disable all internal modules.
+# In these cases external modules controlled by per module setting in 
+# module config
+# To enable of disable external module - create symlink to it in /opt/infodispd/modules-enabled
+modules=all
+
+# Set time to show one modules (can be overridden by module)
+showtime=7
+
+# Set count of decimals (for percentage counter)
+accuracy=2
+
+# Set greeting string
+# Max 20:-12345678901234567890-
+greeting="Hello, InfoDisp!"

@@ -1,0 +1,56 @@
+##############################################################################
+##### acpupsd.module              ############################################
+##############################################################################
+##### apcupsd Information         ############################################
+##### Module for infodisp         ############################################
+##### System Status Daemon        ############################################
+##### for Epson Mode Compatible   ############################################
+##### Character Displays          ############################################
+##############################################################################
+##### (С) Vitaly Prokofiev, 2014  ############################################
+##### infodisp.digitalvintage.ru  ############################################
+##### Licensed under GNU GPL v3   ############################################
+##############################################################################
+##### This is reference module for InfoDisp ##################################
+##############################################################################
+
+#This module requires apcupsd and apcupsd-cgi on controlled system
+
+#Enable or disable module
+enabled="1"
+
+#Set config options
+#Set base URL for apcupsd-cgi web interface
+baseurl="http://localhost/cgi-bin/apcupsd"
+#Set time to show every field
+dtime="3"
+
+#Define function with same name as file
+function apcupsd.module ()
+{
+    declare -A upsdata
+    IFS=$'\n' upsdataraw=($(curl -s "$baseurl/upsfstats.cgi?host=127.0.0.1" |grep ":" |grep -vE "<|>|;|#"))
+    for row in "${upsdataraw[@]}"
+    do
+	row=$(echo $row |sed 's/ \{1,\}/ /g')
+	row=$(echo $row |sed 's/ Volts/V/g')
+	upsdata[$(echo $row |awk -F' : ' '{print $1}')]="$(echo $row |awk -F': ' '{print $2}')"
+    done
+
+    upsdata[LOADPCT]=$(echo ${upsdata[LOADPCT]} |sed 's/ Percent Load Capacity/%/g')
+    upsdata[ITEMP]=$(echo ${upsdata[ITEMP]} |sed 's/ Internal//g')
+    upsdata[BCHARGE]=$(echo ${upsdata[BCHARGE]} |sed 's/ Percent/%/g')
+    upsdata[TIMELEFT]=$(echo ${upsdata[TIMELEFT]} |sed 's/ Minutes/ Min/g')
+
+    caption="UPS: ${upsdata[MODEL]}"    
+    dispout "$caption" "Status: ${upsdata[STATUS]}"
+    sleep $dtime
+    dispout "$caption" "Batt ${upsdata[BCHARGE]}/${upsdata[TIMELEFT]}"
+    sleep $dtime
+    dispout "$caption" "Load ${upsdata[LOADPCT]}/T=${upsdata[ITEMP]}"
+    sleep $dtime
+    dispout "$caption" "IN ${upsdata[LINEV]}/OUT ${upsdata[OUTPUTV]}"
+    sleep $dtime
+    dispout "$caption" "Status: ${upsdata[STATUS]}"
+    sleep $dtime
+}

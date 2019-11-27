@@ -4,6 +4,7 @@
 - name: Get infodisp service state
   command: systemctl is-active infodispd
   register: infodispd_state
+  changed_when: infodispd_state.stdout != "active"
 
 - name: (Re)Install Infodisp
   include: install.yml
